@@ -17,6 +17,7 @@ temp.*
 
 ### Jetbrains ###
 .idea
+*.iml
 
 ### Bitpocket ###
 /.bitpocket/
