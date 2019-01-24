@@ -1,0 +1,6 @@
+package provascala
+
+
+class TestProvaScala {
+
+}
