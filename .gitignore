@@ -18,6 +18,7 @@ temp.*
 ### Jetbrains ###
 .idea
 *.iml
+dependency-reduced-pom.xml
 
 ### Bitpocket ###
 /.bitpocket/
