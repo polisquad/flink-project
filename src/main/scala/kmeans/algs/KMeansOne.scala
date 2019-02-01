@@ -37,12 +37,6 @@ object KMeansOne extends KMeansAlg {
     val finalCentroids: DataSet[Centroid] =
       centroids.iterateWithTermination(cmdArgs.maxIterations)((currentCentroids: DataSet[Centroid]) => {
 
-        // Compure current loss
-        val currentLoss: DataSet[Loss] =
-          currentCentroids
-            .map((c: Centroid) => Loss(CheckConvergence.OldLoss, c.loss))
-            .reduce((l1: Loss, l2: Loss) => l1.copy(value = l1.value + l2.value))
-
         // Compute nearest centroids
         val pwms: DataSet[PointWithMembership] =
           dataset
@@ -63,6 +57,12 @@ object KMeansOne extends KMeansAlg {
             .groupBy((c: Centroid) => c.cluster)
             .reduce((c1: Centroid, c2: Centroid) => c1.copy(c1.cluster, c1.point, c1.loss + c2.loss))
 
+        // Compure old loss
+        val oldLoss: DataSet[Loss] =
+          currentCentroids
+            .map((c: Centroid) => Loss(CheckConvergence.OldLoss, c.loss))
+            .reduce((l1: Loss, l2: Loss) => l1.copy(value = l1.value + l2.value))
+
         // Compute overall new loss
         val newLoss: DataSet[Loss] =
           newCentroids
@@ -71,7 +71,7 @@ object KMeansOne extends KMeansAlg {
 
         // Build termination
         val converged: DataSet[Boolean] =
-          currentLoss
+          oldLoss
             .union(newLoss)
             .reduceGroup(new CheckConvergence(cmdArgs.tolerance))
             .filter((b: Boolean) => b == false)

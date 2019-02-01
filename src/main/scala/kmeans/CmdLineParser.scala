@@ -28,9 +28,10 @@ object CmdLineParser {
     } yield CmdArgs(input, output, k, maxIterations, tol)
   } match {
     case Success(cmdArgs) => cmdArgs
-    case Failure(_) => throw new IllegalArgumentException(
-      """
+    case Failure(e) => throw new IllegalArgumentException(
+      f"""
         |Something went wrong when parsing command line arguments.
+        |>>> ${e.getMessage} <<<
         |Usage:
         | --input where to read the input dataset
         | --output where to write the clustered dataset
