@@ -1,6 +1,6 @@
 package kmeans.algs
 
-import kmeans.CmdLineParser.CmdARgs
+import kmeans.CmdLineParser.CmdArgs
 import kmeans.Utils
 import kmeans.datatypes.Point
 import kmeans.datatypes.TupleLike.{Centroid, Loss, PointWithMembership}
@@ -13,7 +13,7 @@ object KMeansOne extends KMeansAlg {
   val CurrentCentroids = "currentCentroids"
   val NewCentroids = "newCentroids"
   val FinalCentroids = "finalCentroids"
-  val Clusters = "clusters"
+  val Cluster = "cluster"
 
   /**
     * High level overview of this Job:
@@ -22,7 +22,7 @@ object KMeansOne extends KMeansAlg {
     *   - Optimize centroids
     *   - Compute overall loss
     */
-  override def buildJob(cmdArgs: CmdARgs): Unit = {
+  override def buildJob(cmdArgs: CmdArgs): Unit = {
     val env: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
 
     val dataset: DataSet[Point] = env.readTextFile(cmdArgs.input)
@@ -57,8 +57,8 @@ object KMeansOne extends KMeansAlg {
         // Compute loss per centroid
         val newCentroids: DataSet[Centroid] =
           pwms.join(newCentroidsWithoutLoss)
-            .where(Clusters)
-            .equalTo(Clusters)((pwm: PointWithMembership, c: Centroid) =>
+            .where(Cluster)
+            .equalTo(Cluster)((pwm: PointWithMembership, c: Centroid) =>
               Centroid(c.cluster, c.point, pwm.point squaredDistance c.point))
             .groupBy((c: Centroid) => c.cluster)
             .reduce((c1: Centroid, c2: Centroid) => c1.copy(c1.cluster, c1.point, c1.loss + c2.loss))

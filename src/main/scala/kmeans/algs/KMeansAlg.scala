@@ -1,6 +1,6 @@
 package kmeans.algs
 
-import kmeans.CmdLineParser.CmdARgs
+import kmeans.CmdLineParser.CmdArgs
 
 
 trait KMeansAlg {
@@ -8,6 +8,6 @@ trait KMeansAlg {
   /**
     * Builds a Flink Job of the k-means algorithm.
     */
-  def buildJob(cmd: CmdARgs): Unit
+  def buildJob(cmd: CmdArgs): Unit
 
 }

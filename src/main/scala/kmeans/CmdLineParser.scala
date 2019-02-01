@@ -12,22 +12,22 @@ object CmdLineParser {
   val Output = "output"
   val Tolerance = "tolerance"
 
-  case class CmdARgs(input: String,
+  case class CmdArgs(input: String,
                      output: String,
                      k: Int,
                      maxIterations: Int,
                      tolerance: Double)
 
-  def getCmdArgs(implicit params: ParameterTool): CmdARgs = {
+  def getCmdArgs(implicit params: ParameterTool): CmdArgs = {
     for {
       input <- Try(params.get(Input))
       output <- Try(params.get(Output))
       k <- Try(params.getInt(NumClusters))
       maxIterations <- Try(params.getInt(MaxIterations))
       tol <- Try(params.getDouble(Tolerance))
-    } yield CmdARgs(input, output, k, maxIterations, tol)
+    } yield CmdArgs(input, output, k, maxIterations, tol)
   } match {
-    case Success(cmdARgs) => cmdARgs
+    case Success(cmdArgs) => cmdArgs
     case Failure(_) => throw new IllegalArgumentException(
       """
         |Something went wrong when parsing command line arguments.

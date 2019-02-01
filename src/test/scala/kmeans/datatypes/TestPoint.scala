@@ -1,6 +1,5 @@
-package kmeans
+package kmeans.datatypes
 
-import kmeans.datatypes.Point
 import org.scalactic.Equality
 import org.scalatest.FunSuite
 
