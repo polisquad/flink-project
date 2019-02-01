@@ -1,6 +1,7 @@
 package kmeans
 
-import org.scalactic.{Equality, TolerantNumerics}
+import kmeans.datatypes.Point
+import org.scalactic.Equality
 import org.scalatest.FunSuite
 
 
@@ -24,7 +25,7 @@ class TestPoint extends FunSuite {
     assert(p1 * 3 === Point(3, 6, 9))
     assert(p2 === p2)
     assert((p1 ^ 3) === Point(1, 8, 27))
-    assert((p1 squaredDistance p2) === 5.19615242270663)
-    assert((Point(1, 3) squaredDistance Point(4, 7)) === 5.0)
+    assert((p1 distance p2) === 5.19615242270663)
+    assert((Point(1, 3) distance Point(4, 7)) === 5.0)
   }
 }

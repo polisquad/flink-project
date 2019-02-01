@@ -1,11 +1,11 @@
-package kmeans
+package kmeans.datatypes
 
 import scala.annotation.tailrec
 
 /**
   * N-dimensional data point
   */
-class Point private (private val data: Array[Double]) {
+class Point private(private val data: Array[Double]) {
 
   /**
     * General operation to apply f between two Point
@@ -50,17 +50,20 @@ class Point private (private val data: Array[Double]) {
   def /(other: Point): Point = op(other)(_ / _)
 
   // Elementwise ops
-  def ^(powerOf: Double): Point = op(c => math.pow(c, powerOf))
+  def ^(powerOf: Double): Point = op(math.pow(_, powerOf))
 
-  def squaredDistance(other: Point): Double = math.sqrt(((this - other) ^ 2).data.sum)
+  def squaredDistance(other: Point): Double = ((this - other) ^ 2).data.sum
+
+  def distance(other: Point): Double = math.sqrt(this squaredDistance other)
 
   def ==(other: Point): Boolean = {
     @tailrec
     def loop(i: Int): Boolean = {
       if (i >= this.data.length) true
       else if (math.abs(data(i) - other.data(i)) >= Point.Tolerance) false
-      else loop(i+1)
+      else loop(i + 1)
     }
+
     loop(0)
   }
 
@@ -69,15 +72,20 @@ class Point private (private val data: Array[Double]) {
   override def toString: String = {
     "Point(" + data.map(_.toString).mkString(", ") + ")"
   }
+
+  def toCsv: String = {
+    data.map(_.toString).mkString(",")
+  }
 }
 
 object Point {
   val Tolerance: Double = 1e-14
 
-  def apply(data: Double*): Point = new Point(Array(data:_*))
+  def apply(data: Double*): Point = new Point(Array(data: _*))
+
   private def apply(data: Array[Double]): Point = new Point(data)
 
-  implicit class ScalarOps (val scalar: Double) extends AnyVal {
+  implicit class ScalarOps(val scalar: Double) extends AnyVal {
     def +(point: Point): Point = point + scalar
     def *(point: Point): Point = point * scalar
     def -(point: Point): Point = point - scalar

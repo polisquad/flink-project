@@ -118,8 +118,9 @@
                                 </filter>
                             </filters>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass><!-- Define here kmeans  class--></mainClass>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>kmeans.Main</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -215,26 +216,26 @@
                 </executions>
             </plugin>
 
-    <!-- enable scalatest -->
-                <plugin>
-                    <groupId>org.scalatest</groupId>
-                    <artifactId>scalatest-maven-plugin</artifactId>
-                    <version>1.0</version>
-                    <configuration>
-                        <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-                        <junitxml>.</junitxml>
-                        <filereports>WDF TestSuite.txt</filereports>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>test</id>
-                            <goals>
-                                <goal>test</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-    </plugins>
+            <!-- enable scalatest -->
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                    <junitxml>.</junitxml>
+                    <filereports>WDF TestSuite.txt</filereports>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <!-- This profile helps to make things run out of the box in IntelliJ -->
