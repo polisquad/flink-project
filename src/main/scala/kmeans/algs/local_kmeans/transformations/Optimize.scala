@@ -73,3 +73,7 @@ class Optimize(k: Int, varId: String) extends RichMapPartitionFunction[Point, Lo
     }
   }
 }
+
+object Optimize {
+  def apply(k: Int, varId: String): Optimize = new Optimize(k, varId)
+}

@@ -41,3 +41,7 @@ class ComputeMembership(varId: String) extends RichMapPartitionFunction[Point, P
     values.forEach((p: Point) => out.collect(findNearest(p)))
   }
 }
+
+object ComputeMembership {
+  def apply(varId: String): ComputeMembership = new ComputeMembership(varId)
+}

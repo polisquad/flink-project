@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
   * Combine here is not needed since we have that the operators before this group reduce
   * produce one centroids per cluster
   */
-class ComputeGlobalCentroids(val parallelism: Int) extends RichGroupReduceFunction[LocalCentroid, Centroid] {
+class ComputeGlobalCentroids(parallelism: Int) extends RichGroupReduceFunction[LocalCentroid, Centroid] {
 
   @tailrec
   private def reduceIterator(curr: Point, numZeroed: Int, localCentroids: Iterator[LocalCentroid]): (Point, Int) = {
@@ -32,10 +32,14 @@ class ComputeGlobalCentroids(val parallelism: Int) extends RichGroupReduceFuncti
 
     if (it.hasNext) {
       val firstElement = it.next
-      val (curr, numZeroed) = reduceIterator(firstElement.point, 0, it)
+      val (finalCentroidPoint, numZeroed) = reduceIterator(firstElement.point, 0, it)
 
       // Why parallelism - numZeroed? In case a partition did not contribute to a subset of the centroids
-      out.collect(Centroid(firstElement.cluster, curr / (parallelism - numZeroed)))
+      out.collect(Centroid(firstElement.cluster, finalCentroidPoint / (parallelism - numZeroed)))
     }
   }
+}
+
+object ComputeGlobalCentroids {
+  def apply(parallelism: Int): ComputeGlobalCentroids = new ComputeGlobalCentroids(parallelism)
 }

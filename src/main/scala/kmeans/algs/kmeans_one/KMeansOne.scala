@@ -38,7 +38,7 @@ object KMeansOne extends KMeansAlg {
         // Compute new memberships
         val pwms: DataSet[PointWithMembership] =
           dataset
-            .map(new OptimizeMemberships(CurrentCentroids)).withBroadcastSet(currentCentroids, CurrentCentroids)
+            .map(OptimizeMemberships(CurrentCentroids)).withBroadcastSet(currentCentroids, CurrentCentroids)
 
         // Compute new centroids
         val newCentroids: DataSet[Centroid] =
@@ -66,7 +66,7 @@ object KMeansOne extends KMeansAlg {
         // Build termination
         val converged: DataSet[Boolean] =
           newLoss
-            .reduceGroup(new CheckConvergence(cmdArgs.tolerance))
+            .reduceGroup(CheckConvergence(cmdArgs.tolerance))
 
         (newCentroids, converged)
       })
@@ -74,7 +74,7 @@ object KMeansOne extends KMeansAlg {
     // Build up final clustered dataset
     val clusteredDataset: DataSet[PointWithMembership] =
       dataset
-        .map(new OptimizeMemberships(FinalCentroids)).withBroadcastSet(finalCentroids, FinalCentroids)
+        .map(OptimizeMemberships(FinalCentroids)).withBroadcastSet(finalCentroids, FinalCentroids)
 
     // Write results to file
     Utils.writeClusteredDatasetToFile(cmdArgs.output, clusteredDataset.collect())

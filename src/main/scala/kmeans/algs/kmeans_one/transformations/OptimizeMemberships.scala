@@ -34,3 +34,8 @@ class OptimizeMemberships(varId: String) extends RichMapFunction[Point, PointWit
     PointWithMembership(loop(nearestCentroid, minDist, currentCentroids.tail).cluster, p)
   }
 }
+
+
+object OptimizeMemberships {
+  def apply(varId: String): OptimizeMemberships = new OptimizeMemberships(varId)
+}

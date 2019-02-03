@@ -7,7 +7,7 @@ import org.apache.flink.api.common.functions._
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.util.Collector
 
-class CheckConvergence(tol: Double) extends RichGroupReduceFunction[Double, Boolean] {
+class CheckConvergence(tolerance: Double) extends RichGroupReduceFunction[Double, Boolean] {
   import CheckConvergence._
 
   private val numEpoch = new IntCounter(0)
@@ -26,11 +26,13 @@ class CheckConvergence(tol: Double) extends RichGroupReduceFunction[Double, Bool
     val neww = newLoss.iterator().next()
     losses.add(neww)
     numEpoch.add(1)
-    if (math.abs(old - neww) > tol) out.collect(false)
+    if (math.abs(old - neww) > tolerance) out.collect(false)
   }
 }
 
 object CheckConvergence {
   val NumEpoch = "numEpoch"
   val Losses = "losses"
+
+  def apply(tolerance: Double): CheckConvergence = new CheckConvergence(tolerance)
 }

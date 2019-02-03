@@ -32,15 +32,15 @@ object LocalKMeans extends KMeansAlg {
       centroids.iterate(cmdArgs.maxIterations)((currentCentroids: DataSet[Centroid]) => {
         // Compute new centroids
         dataset
-          .mapPartition(new Optimize(cmdArgs.k, CurrentCentroids)).withBroadcastSet(currentCentroids, CurrentCentroids)
+          .mapPartition(Optimize(cmdArgs.k, CurrentCentroids)).withBroadcastSet(currentCentroids, CurrentCentroids)
           .groupBy((lc: LocalCentroid) => lc.cluster)
-          .reduceGroup(new ComputeGlobalCentroids(env.getParallelism))
+          .reduceGroup(ComputeGlobalCentroids(env.getParallelism))
       })
 
     // Build up final clustered dataset
     val clusteredDataset: DataSet[PointWithMembership] =
       dataset
-        .mapPartition(new ComputeMembership(FinalCentroids)).withBroadcastSet(finalCentroids, FinalCentroids)
+        .mapPartition(ComputeMembership(FinalCentroids)).withBroadcastSet(finalCentroids, FinalCentroids)
 
     // Write results to file
     Utils.writeClusteredDatasetToFile(cmdArgs.output, clusteredDataset.collect())

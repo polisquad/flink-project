@@ -1,4 +1,4 @@
-package kmeans.algs.common.datatypes
+package kmeans.algs.common
 
 import kmeans.algs.common.Point
 import org.scalactic.Equality
