@@ -12,6 +12,9 @@ object CmdLineParser {
   val Output = "output"
   val Tolerance = "tolerance"
 
+  val DefaultMaxIterations = 100
+  val DefaultTolerance = 1e-2
+
   case class CmdArgs(input: String,
                      output: String,
                      k: Int,
@@ -23,9 +26,9 @@ object CmdLineParser {
       input <- Try(params.get(Input))
       output <- Try(params.get(Output))
       k <- Try(params.getInt(NumClusters))
-      maxIterations <- Try(params.getInt(MaxIterations))
-      tol <- Try(params.getDouble(Tolerance))
-    } yield CmdArgs(input, output, k, maxIterations, tol)
+      maxIterations <- Try(params.getInt(MaxIterations, DefaultMaxIterations))
+      tolerance <- Try(params.getDouble(Tolerance, DefaultTolerance))
+    } yield CmdArgs(input, output, k, maxIterations, tolerance)
   } match {
     case Success(cmdArgs) => cmdArgs
     case Failure(e) => throw new IllegalArgumentException(

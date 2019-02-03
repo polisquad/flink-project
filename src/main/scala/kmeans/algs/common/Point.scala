@@ -1,4 +1,4 @@
-package kmeans.datatypes
+package kmeans.algs.common
 
 import scala.annotation.tailrec
 
@@ -6,6 +6,8 @@ import scala.annotation.tailrec
   * N-dimensional data point
   */
 class Point private(private val data: Array[Double]) {
+
+  private val dim = data.length
 
   /**
     * General operation to apply f between two Point
@@ -76,6 +78,8 @@ class Point private(private val data: Array[Double]) {
   def toCsv: String = {
     data.map(_.toString).mkString(",")
   }
+
+  def getDim: Int = dim
 }
 
 object Point {

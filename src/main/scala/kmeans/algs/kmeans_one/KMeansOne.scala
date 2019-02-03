@@ -1,10 +1,12 @@
-package kmeans.algs
+package kmeans.algs.kmeans_one
 
 import kmeans.CmdLineParser.CmdArgs
 import kmeans.Utils
-import kmeans.datatypes.Point
-import kmeans.datatypes.TupleLike.{Centroid, Loss, PointWithMembership}
-import kmeans.transformations.{CheckConvergence, OptimizeCentroids, OptimizeMemberships}
+import kmeans.algs.KMeansAlg
+import kmeans.algs.common.Point
+import kmeans.algs.common.TupleLike.PointWithMembership
+import kmeans.algs.kmeans_one.TupleLike.Centroid
+import kmeans.algs.kmeans_one.transformations.{CheckConvergence, OptimizeMemberships}
 import org.apache.flink.api.scala.utils._
 import org.apache.flink.api.scala.{DataSet, ExecutionEnvironment, _}
 
@@ -15,13 +17,9 @@ object KMeansOne extends KMeansAlg {
   val FinalCentroids = "finalCentroids"
   val Cluster = "cluster"
 
-  /**
-    * High level overview of this Job:
-    *   - Optimize membership
-    *   - Group points by clusters
-    *   - Optimize centroids
-    *   - Compute overall loss
-    */
+  type PwmL = (PointWithMembership, Long)
+  type CentroidLoss = (Int, Double)
+
   override def buildJob(cmdArgs: CmdArgs): Unit = {
     val env: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
 
@@ -32,49 +30,43 @@ object KMeansOne extends KMeansAlg {
     val centroids: DataSet[Centroid] = dataset
       .first(cmdArgs.k)
       .zipWithIndex
-      .map((t: (Long, Point)) => Centroid(t._1.toInt, t._2, 0))
+      .map((t: (Long, Point)) => Centroid(t._1.toInt, t._2))
 
     val finalCentroids: DataSet[Centroid] =
       centroids.iterateWithTermination(cmdArgs.maxIterations)((currentCentroids: DataSet[Centroid]) => {
 
-        // Compute nearest centroids
+        // Compute new memberships
         val pwms: DataSet[PointWithMembership] =
           dataset
             .map(new OptimizeMemberships(CurrentCentroids)).withBroadcastSet(currentCentroids, CurrentCentroids)
 
         // Compute new centroids
-        val newCentroidsWithoutLoss: DataSet[Centroid] =
+        val newCentroids: DataSet[Centroid] =
           pwms
-            .groupBy((pwm: PointWithMembership) => pwm.cluster)
-            .reduceGroup(new OptimizeCentroids())
+            .map((pwm: PointWithMembership) => (pwm, 1L))
+            .groupBy((t: PwmL) => t._1.cluster)
+            .reduce((t1: PwmL, t2: PwmL) => (t1._1.copy(point = t1._1.point + t2._1.point), t1._2 + t2._2))
+            .map((t: PwmL) => Centroid(t._1.cluster, t._1.point / t._2))
 
         // Compute loss per centroid
-        val newCentroids: DataSet[Centroid] =
-          pwms.join(newCentroidsWithoutLoss)
+        val lossPerCentroid: DataSet[CentroidLoss] =
+          pwms
+            .join(newCentroids)
             .where(Cluster)
-            .equalTo(Cluster)((pwm: PointWithMembership, c: Centroid) =>
-              Centroid(c.cluster, c.point, pwm.point squaredDistance c.point))
-            .groupBy((c: Centroid) => c.cluster)
-            .reduce((c1: Centroid, c2: Centroid) => c1.copy(c1.cluster, c1.point, c1.loss + c2.loss))
-
-        // Compure old loss
-        val oldLoss: DataSet[Loss] =
-          currentCentroids
-            .map((c: Centroid) => Loss(CheckConvergence.OldLoss, c.loss))
-            .reduce((l1: Loss, l2: Loss) => l1.copy(value = l1.value + l2.value))
+            .equalTo(Cluster)((pwm: PointWithMembership, c: Centroid) => (pwm.cluster, pwm.point squaredDistance c.point))
+            .groupBy((t: CentroidLoss) => t._1)
+            .reduce((t1: CentroidLoss, t2: CentroidLoss) => (t1._1, t1._2 + t2._2))
 
         // Compute overall new loss
-        val newLoss: DataSet[Loss] =
-          newCentroids
-            .map((c: Centroid) => Loss(CheckConvergence.NewLoss, c.loss))
-            .reduce((l1: Loss, l2: Loss) => l1.copy(value = l1.value + l2.value))
+        val newLoss: DataSet[Double] =
+          lossPerCentroid
+            .map((t: CentroidLoss) => t._2)
+            .reduce((l1: Double, l2: Double) => l1 + l2)
 
         // Build termination
         val converged: DataSet[Boolean] =
-          oldLoss
-            .union(newLoss)
+          newLoss
             .reduceGroup(new CheckConvergence(cmdArgs.tolerance))
-            .filter((b: Boolean) => b == false)
 
         (newCentroids, converged)
       })

@@ -1,7 +1,8 @@
-package kmeans.transformations
+package kmeans.algs.kmeans_one.transformations
 
-import kmeans.datatypes.Point
-import kmeans.datatypes.TupleLike.{Centroid, PointWithMembership}
+import kmeans.algs.common.Point
+import kmeans.algs.common.TupleLike.PointWithMembership
+import kmeans.algs.kmeans_one.TupleLike.Centroid
 import org.apache.flink.api.common.functions.RichMapFunction
 import org.apache.flink.configuration.Configuration
 
@@ -30,6 +31,6 @@ class OptimizeMemberships(varId: String) extends RichMapFunction[Point, PointWit
         currentNearest
     }
 
-    PointWithMembership(loop(nearestCentroid, minDist, currentCentroids).cluster, p)
+    PointWithMembership(loop(nearestCentroid, minDist, currentCentroids.tail).cluster, p)
   }
 }

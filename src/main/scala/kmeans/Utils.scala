@@ -2,8 +2,8 @@ package kmeans
 
 import java.io.PrintWriter
 
-import kmeans.datatypes.Point
-import kmeans.datatypes.TupleLike.PointWithMembership
+import kmeans.algs.common.Point
+import kmeans.algs.common.TupleLike.PointWithMembership
 
 import scala.util.Random
 

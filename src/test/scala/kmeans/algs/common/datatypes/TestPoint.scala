@@ -1,5 +1,6 @@
-package kmeans.datatypes
+package kmeans.algs.common.datatypes
 
+import kmeans.algs.common.Point
 import org.scalactic.Equality
 import org.scalatest.FunSuite
 
@@ -21,6 +22,7 @@ class TestPoint extends FunSuite {
     val p1 = Point(1, 2, 3)
     val p2 = Point(4, 5, 6)
 
+    assert(p1.getDim === 3)
     assert(p1 * 3 === Point(3, 6, 9))
     assert(p2 === p2)
     assert((p1 ^ 3) === Point(1, 8, 27))
