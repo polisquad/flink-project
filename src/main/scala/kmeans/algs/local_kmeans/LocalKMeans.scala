@@ -24,7 +24,7 @@ object LocalKMeans extends KMeansAlg {
       .map((pointString: String) => Point(pointString.split(",").map(_.toDouble): _*))
 
     val centroids: DataSet[Centroid] = dataset
-      .first(cmdArgs.k)
+      .first(cmdArgs.numClusters)
       .zipWithIndex
       .map((t: (Long, Point)) => Centroid(t._1.toInt, t._2))
 
@@ -32,7 +32,8 @@ object LocalKMeans extends KMeansAlg {
       centroids.iterate(cmdArgs.maxIterations)((currentCentroids: DataSet[Centroid]) => {
         // Compute new centroids
         dataset
-          .mapPartition(Optimize(cmdArgs.k, CurrentCentroids)).withBroadcastSet(currentCentroids, CurrentCentroids)
+          //.rebalance() // to distribute in a round-robin fashion, NOTE: this is costly
+          .mapPartition(Optimize(cmdArgs.numClusters, CurrentCentroids)).withBroadcastSet(currentCentroids, CurrentCentroids)
           .groupBy((lc: LocalCentroid) => lc.cluster)
           .reduceGroup(ComputeGlobalCentroids(env.getParallelism))
       })

@@ -1,6 +1,5 @@
 package kmeans.algs.common
 
-import kmeans.algs.common.Point
 import org.scalactic.Equality
 import org.scalatest.FunSuite
 

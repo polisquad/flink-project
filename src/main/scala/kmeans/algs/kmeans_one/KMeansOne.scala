@@ -28,7 +28,7 @@ object KMeansOne extends KMeansAlg {
       .map((pointString: String) => Point(pointString.split(",").map(_.toDouble): _*))
 
     val centroids: DataSet[Centroid] = dataset
-      .first(cmdArgs.k)
+      .first(cmdArgs.numClusters)
       .zipWithIndex
       .map((t: (Long, Point)) => Centroid(t._1.toInt, t._2))
 

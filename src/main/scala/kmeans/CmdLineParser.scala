@@ -17,7 +17,7 @@ object CmdLineParser {
 
   case class CmdArgs(input: String,
                      output: String,
-                     k: Int,
+                     numClusters: Int,
                      maxIterations: Int,
                      tolerance: Double)
 
@@ -25,10 +25,10 @@ object CmdLineParser {
     for {
       input <- Try(params.get(Input))
       output <- Try(params.get(Output))
-      k <- Try(params.getInt(NumClusters))
+      numClusters <- Try(params.getInt(NumClusters))
       maxIterations <- Try(params.getInt(MaxIterations, DefaultMaxIterations))
       tolerance <- Try(params.getDouble(Tolerance, DefaultTolerance))
-    } yield CmdArgs(input, output, k, maxIterations, tolerance)
+    } yield CmdArgs(input, output, numClusters, maxIterations, tolerance)
   } match {
     case Success(cmdArgs) => cmdArgs
     case Failure(e) => throw new IllegalArgumentException(
@@ -38,7 +38,7 @@ object CmdLineParser {
         |Usage:
         | --input where to read the input dataset
         | --output where to write the clustered dataset
-        | --k the number of clusters
+        | --numClusters the number of clusters
         | --maxIterations the max number of iterations
         | --tol the tolerance used when checking for convergence
       """.stripMargin

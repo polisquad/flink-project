@@ -65,9 +65,9 @@ class Optimize(k: Int, varId: String) extends RichMapPartitionFunction[Point, Lo
       }
     } else {
       // This partition received no points
-      // Super rare taken branch
+      // Super rare taken branch if data >> parallelism
       val zeroedCentroid: Point = Point(Array.fill(currentCentroids.head.point.getDim)(0.0): _*)
-      for (i <- 0 to k) {
+      for (i <- 0 until k) {
         out.collect(LocalCentroid(i, zeroedCentroid, true))
       }
     }
