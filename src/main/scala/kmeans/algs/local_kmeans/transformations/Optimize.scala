@@ -54,21 +54,7 @@ class Optimize(k: Int, varId: String) extends RichMapPartitionFunction[Point, Lo
       })
 
       for (i <- newLocalCentroids.indices) {
-        if (numPointsPerCentroids(i) > 0) {
-          newLocalCentroids(i) /= numPointsPerCentroids(i)
-          out.collect(LocalCentroid(i, newLocalCentroids(i), false))
-        } else {
-          // It may happen that in this partition we have points whose nearest centroids are only a subset
-          // of the centroids
-          out.collect(LocalCentroid(i, newLocalCentroids(i), true))
-        }
-      }
-    } else {
-      // This partition received no points
-      // Super rare taken branch if data >> parallelism
-      val zeroedCentroid: Point = Point(Array.fill(currentCentroids.head.point.getDim)(0.0): _*)
-      for (i <- 0 until k) {
-        out.collect(LocalCentroid(i, zeroedCentroid, true))
+        out.collect(LocalCentroid(i, newLocalCentroids(i), numPointsPerCentroids(i)))
       }
     }
   }
