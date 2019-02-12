@@ -35,7 +35,7 @@ object LocalKMeans extends KMeansAlg {
           //.rebalance() // to distribute in a round-robin fashion, NOTE: this is costly
           .mapPartition(Optimize(cmdArgs.numClusters, CurrentCentroids)).withBroadcastSet(currentCentroids, CurrentCentroids)
           .groupBy((lc: LocalCentroid) => lc.cluster)
-          .reduceGroup(ComputeGlobalCentroids(env.getParallelism))
+          .reduceGroup(ComputeGlobalCentroids())
       })
 
     // Build up final clustered dataset

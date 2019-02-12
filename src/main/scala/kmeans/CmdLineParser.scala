@@ -40,7 +40,7 @@ object CmdLineParser {
         | --output where to write the clustered dataset
         | --numClusters the number of clusters
         | --maxIterations the max number of iterations
-        | --tol the tolerance used when checking for convergence
+        | --tolerance the tolerance used when checking for convergence
       """.stripMargin
     )
   }

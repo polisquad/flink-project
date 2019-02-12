@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
   * Combine here is not needed since we have that the operators before this group reduce
   * produce one centroids per cluster
   */
-class ComputeGlobalCentroids(parallelism: Int) extends RichGroupReduceFunction[LocalCentroid, Centroid] {
+class ComputeGlobalCentroids extends RichGroupReduceFunction[LocalCentroid, Centroid] {
 
   @tailrec
   private def reduceIterator(curr: Point, numPoints: Long, localCentroids: Iterator[LocalCentroid]): (Point, Long) = {
@@ -39,5 +39,5 @@ class ComputeGlobalCentroids(parallelism: Int) extends RichGroupReduceFunction[L
 }
 
 object ComputeGlobalCentroids {
-  def apply(parallelism: Int): ComputeGlobalCentroids = new ComputeGlobalCentroids(parallelism)
+  def apply(): ComputeGlobalCentroids = new ComputeGlobalCentroids()
 }
