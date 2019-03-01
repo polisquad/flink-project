@@ -38,7 +38,7 @@ class ComputeMembership(varId: String) extends RichMapPartitionFunction[Point, P
   }
 
   override def mapPartition(values: lang.Iterable[Point], out: Collector[PointWithMembership]): Unit = {
-    values.forEach((p: Point) => out.collect(findNearest(p)))
+    values.forEach {p: Point => out.collect(findNearest(p)) }
   }
 }
 

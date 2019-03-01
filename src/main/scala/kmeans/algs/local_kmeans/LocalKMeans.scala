@@ -20,13 +20,13 @@ object LocalKMeans extends KMeansAlg {
     val env: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
 
     val dataset: DataSet[Point] = env.readTextFile(cmdArgs.input)
-      .flatMap((datasetString: String) => datasetString.split("\n"))
-      .map((pointString: String) => Point(pointString.split(",").map(_.toDouble): _*))
+      .flatMap { datasetString: String => datasetString.split("\n") }
+      .map { pointString: String => Point(pointString.split(",").map(_.toDouble): _*) }
 
     val centroids: DataSet[Centroid] = dataset
       .first(cmdArgs.numClusters)
       .zipWithIndex
-      .map((t: (Long, Point)) => Centroid(t._1.toInt, t._2))
+      .map { t: (Long, Point) => Centroid(t._1.toInt, t._2) }
 
     val finalCentroids: DataSet[Centroid] =
       centroids.iterate(cmdArgs.maxIterations)((currentCentroids: DataSet[Centroid]) => {
@@ -34,7 +34,7 @@ object LocalKMeans extends KMeansAlg {
         dataset
           //.rebalance() // to distribute in a round-robin fashion, NOTE: this is costly
           .mapPartition(Optimize(cmdArgs.numClusters, CurrentCentroids)).withBroadcastSet(currentCentroids, CurrentCentroids)
-          .groupBy((lc: LocalCentroid) => lc.cluster)
+          .groupBy { lc: LocalCentroid => lc.cluster }
           .reduceGroup(ComputeGlobalCentroids())
       })
 

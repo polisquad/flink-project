@@ -6,6 +6,7 @@ temp.*
 *.csv
 /target/
 /project/
+.DS_Store
 
 # Binaries --------------------------------------
 /bin/
